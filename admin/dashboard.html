@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script>
+    (function () {
+      var path = window.location.pathname;
+      var base = (path === '/Insova' || path.indexOf('/Insova/') === 0) ? '/Insova/' : '/';
+      document.write('<base href="' + base + '">');
+    })();
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | Team Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="dashboard" class="font-sans antialiased bg-[var(--color-bg)]">
+
+  <div id="toast-container" aria-live="polite"></div>
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden"></div>
+
+  <aside id="sidebar" class="fixed top-0 left-0 z-50 h-full w-64 bg-[var(--color-bg-elevated)] border-r border-[var(--color-border)] flex flex-col -translate-x-full lg:translate-x-0 transition-transform duration-300">
+    <div class="flex items-center justify-between p-5 border-b border-[var(--color-border)]">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-xs">TM</div>
+        <span class="font-bold text-primary text-sm">Admin Panel</span>
+      </div>
+      <button id="sidebar-close" type="button" class="lg:hidden p-1 text-muted">✕</button>
+    </div>
+    <nav class="flex-1 p-4 space-y-1 overflow-y-auto">
+      <button type="button" data-tab-btn="members" class="sidebar-link sidebar-link-active">👥 Team Directory</button>
+      <button type="button" data-tab-btn="competitions" class="sidebar-link">🏆 Competitions</button>
+      <button type="button" data-tab-btn="tasks" class="sidebar-link">📋 Tasks</button>
+      <button type="button" data-tab-btn="evaluations" class="sidebar-link">⭐ Evaluations & MVP</button>
+    </nav>
+    <div class="p-4 border-t border-[var(--color-border)] space-y-2">
+      <button type="button" data-theme-toggle class="sidebar-link">🌓 Toggle Theme</button>
+      <button type="button" data-logout class="sidebar-link text-red-500">🚪 Sign Out</button>
+    </div>
+  </aside>
+
+  <div class="lg:ml-64 min-h-screen flex flex-col">
+    <header class="sticky top-0 z-30 glass-nav px-4 sm:px-6 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <button id="sidebar-open" type="button" class="lg:hidden p-2 rounded-lg border border-[var(--color-border)]">☰</button>
+        <h1 class="text-lg font-bold text-primary">Dashboard</h1>
+      </div>
+      <div class="flex items-center gap-3 text-sm">
+        <span id="admin-email" class="text-muted hidden sm:block"></span>
+        <a href="index.html" class="text-muted hover:text-primary text-xs">Public Page</a>
+      </div>
+    </header>
+
+    <div id="dashboard-loading" class="hidden fixed inset-0 z-20 bg-[var(--color-bg)]/80 flex items-center justify-center"><div class="spinner"></div></div>
+
+    <main class="flex-1 p-4 sm:p-6 max-w-7xl mx-auto w-full">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+        <div class="stat-card"><p class="text-xs text-muted uppercase font-semibold">Members</p><p id="stat-members" class="stat-value">—</p></div>
+        <div class="stat-card"><p class="text-xs text-muted uppercase font-semibold">Competitions</p><p id="stat-competitions" class="stat-value">—</p></div>
+        <div class="stat-card"><p class="text-xs text-muted uppercase font-semibold">Tasks</p><p id="stat-tasks" class="stat-value">—</p></div>
+        <div class="stat-card"><p class="text-xs text-muted uppercase font-semibold">Eval Period</p><p id="eval-month-label" class="text-sm font-bold text-primary mt-1">—</p></div>
+      </div>
+
+      <!-- MEMBERS -->
+      <section data-tab-panel="members" class="space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div><h2 class="text-xl font-bold text-primary">Team Directory</h2><p class="text-sm text-muted">View CV profiles, edit, export</p></div>
+          <button type="button" id="export-all-members" class="btn btn-secondary btn-sm">📊 Export All (Excel)</button>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-3">
+          <input type="search" id="member-search" class="input flex-1" placeholder="Search name, ID, email, phone…" />
+          <select id="member-age-filter" class="input sm:w-48">
+            <option value="all">All Ages</option>
+            <option value="under20">Under 20</option>
+            <option value="20-25">20 – 25</option>
+            <option value="over25">Over 25</option>
+          </select>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>Photo</th><th>Name</th><th>National ID</th><th>Phone</th><th>Student ID</th><th>Registered</th><th>Actions</th></tr></thead>
+            <tbody id="members-tbody"></tbody>
+          </table>
+        </div>
+        <div id="members-empty" class="hidden text-center py-12 text-muted">No members found.</div>
+      </section>
+
+      <!-- COMPETITIONS -->
+      <section data-tab-panel="competitions" class="hidden space-y-4">
+        <div class="flex justify-between items-center gap-3">
+          <div><h2 class="text-xl font-bold text-primary">Competitions & Projects</h2><p class="text-sm text-muted">Images, team, cost, components</p></div>
+          <button type="button" id="add-competition-btn" class="btn btn-primary btn-sm">+ Add Competition</button>
+        </div>
+        <div id="competitions-grid" class="grid grid-cols-1 lg:grid-cols-2 gap-4"></div>
+        <div id="competitions-empty" class="hidden text-center py-12 text-muted">No competitions yet.</div>
+      </section>
+
+      <!-- TASKS -->
+      <section data-tab-panel="tasks" class="hidden space-y-4">
+        <div class="flex justify-between items-center gap-3">
+          <div><h2 class="text-xl font-bold text-primary">Tasks</h2><p class="text-sm text-muted">Competition or external tasks with progress & ratings</p></div>
+          <button type="button" id="add-task-btn" class="btn btn-primary btn-sm">+ Add Task</button>
+        </div>
+        <div id="tasks-list"></div>
+        <div id="tasks-empty" class="hidden text-center py-12 text-muted">No tasks yet.</div>
+      </section>
+
+      <!-- EVALUATIONS -->
+      <section data-tab-panel="evaluations" class="hidden space-y-4">
+        <div><h2 class="text-xl font-bold text-primary">Evaluation & Monthly MVP</h2><p class="text-sm text-muted">Score members 0–10 for this month</p></div>
+        <div id="mvp-hero" aria-live="polite"></div>
+        <div id="evaluations-list" class="space-y-3"></div>
+        <div id="evaluations-empty" class="hidden text-center py-12 text-muted">No members to evaluate.</div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Member CV Modal -->
+  <div id="member-cv-modal" class="modal-backdrop hidden" role="dialog" aria-modal="true">
+    <div class="modal-panel cv-panel">
+      <div class="modal-header">
+        <h3 class="text-lg font-bold text-primary">Member Profile (CV)</h3>
+        <button type="button" data-close-cv-modal class="text-muted text-xl">×</button>
+      </div>
+      <div class="modal-body" id="member-cv-body"></div>
+    </div>
+  </div>
+
+  <!-- Edit Member Modal -->
+  <div id="edit-member-modal" class="modal-backdrop hidden">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h3 class="text-lg font-bold text-primary">Edit Member</h3>
+        <button type="button" data-close-edit-modal class="text-muted text-xl">×</button>
+      </div>
+      <form id="edit-member-form" class="modal-body space-y-4">
+        <input type="text" name="fullName" class="input" placeholder="Full Name" required />
+        <p class="form-error hidden" data-error-for="fullName"></p>
+        <input type="text" name="nationalId" class="input font-mono" placeholder="National ID" maxlength="14" required />
+        <p class="form-error hidden" data-error-for="nationalId"></p>
+        <div class="grid grid-cols-2 gap-3">
+          <input type="number" name="age" class="input" placeholder="Age" min="16" max="100" required />
+          <input type="text" name="studentId" class="input font-mono" placeholder="Student ID" required />
+        </div>
+        <input type="email" name="email" class="input" placeholder="Email" required />
+        <p class="form-error hidden" data-error-for="email"></p>
+        <input type="tel" name="phone" class="input" placeholder="Phone" required />
+        <p class="form-error hidden" data-error-for="phone"></p>
+        <textarea name="address" class="input" rows="2" placeholder="Address" required></textarea>
+        <p class="form-error hidden" data-error-for="address"></p>
+        <div class="modal-footer -mx-6 -mb-6 mt-2">
+          <button type="button" data-close-edit-modal class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Competition Modal -->
+  <div id="add-competition-modal" class="modal-backdrop hidden">
+    <div class="modal-panel modal-lg">
+      <div class="modal-header">
+        <h3 class="text-lg font-bold text-primary">Add Competition</h3>
+        <button type="button" data-close-competition-modal class="text-muted text-xl">×</button>
+      </div>
+      <form id="add-competition-form" class="modal-body space-y-4">
+        <input type="text" name="compName" class="input" placeholder="Competition Name *" required />
+        <input type="text" name="projectName" class="input" placeholder="Project Name *" required />
+        <input type="datetime-local" name="deadlineDate" class="input" required />
+        <select name="status" class="input">
+          <option value="active">Active</option><option value="upcoming">Upcoming</option>
+          <option value="completed">Completed</option><option value="cancelled">Cancelled</option>
+        </select>
+        <textarea name="description" class="input" rows="2" placeholder="Description"></textarea>
+        <div>
+          <label class="form-label">Project Image</label>
+          <input type="file" name="projectImage" accept="image/*" class="input" />
+        </div>
+        <div>
+          <label class="form-label">Team Members (hold Ctrl to select multiple)</label>
+          <select name="members" id="comp-members" class="input" multiple size="4"></select>
+        </div>
+        <input type="number" name="cost" class="input" placeholder="Total Cost (EGP)" min="0" step="0.01" />
+        <div>
+          <div class="flex justify-between items-center mb-2">
+            <label class="form-label mb-0">Components & Materials</label>
+            <button type="button" id="add-component-row" class="btn btn-sm btn-secondary">+ Add Row</button>
+          </div>
+          <div id="components-list"></div>
+        </div>
+        <div class="modal-footer -mx-6 -mb-6 mt-2">
+          <button type="button" data-close-competition-modal class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Add Task Modal -->
+  <div id="add-task-modal" class="modal-backdrop hidden">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <h3 class="text-lg font-bold text-primary">Add Task</h3>
+        <button type="button" data-close-task-modal class="text-muted text-xl">×</button>
+      </div>
+      <form id="add-task-form" class="modal-body space-y-4">
+        <input type="text" name="title" class="input" placeholder="Task Title *" required />
+        <textarea name="description" class="input" rows="2" placeholder="Description"></textarea>
+        <select name="type" id="task-type" class="input">
+          <option value="external">External Task</option>
+          <option value="competition">Competition Task</option>
+        </select>
+        <div id="task-competition-wrap" class="hidden">
+          <label class="form-label">Linked Competition</label>
+          <select name="competition" id="task-competition" class="input"></select>
+        </div>
+        <div>
+          <label class="form-label">Assign Members (Ctrl+click)</label>
+          <select name="members" id="task-members" class="input" multiple size="5" required></select>
+        </div>
+        <input type="datetime-local" name="dueDate" class="input" />
+        <div class="modal-footer -mx-6 -mb-6 mt-2">
+          <button type="button" data-close-task-modal class="btn btn-secondary">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Task</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
