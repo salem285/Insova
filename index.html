@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Team Registration | Team Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config = { darkMode: 'class' };</script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-page="registration" class="page-shell font-sans antialiased">
+  <div id="toast-container" aria-live="polite"></div>
+
+  <header class="glass-nav sticky top-0 z-40">
+    <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-sm">TM</div>
+        <span class="font-semibold text-primary hidden sm:block">Team Management System</span>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="admin/login.html" class="text-sm text-muted hover:text-primary">Admin Login</a>
+        <button type="button" data-theme-toggle class="p-2 rounded-lg border border-[var(--color-border)]" aria-label="Toggle theme">🌓</button>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero-gradient text-white py-12">
+    <div class="max-w-3xl mx-auto px-4 text-center">
+      <h1 class="text-3xl font-extrabold">Join Our Team</h1>
+      <p class="mt-3 text-indigo-100 text-sm">Complete your profile with photos and contact details.</p>
+    </div>
+  </section>
+
+  <main class="flex-1 max-w-2xl mx-auto w-full px-4 -mt-8 pb-16">
+    <div class="card p-6 sm:p-8">
+      <h2 class="text-xl font-bold text-primary mb-6">Member Registration</h2>
+
+      <form id="registration-form" novalidate class="space-y-5">
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label for="fullName" class="form-label">Full Name</label>
+            <input type="text" id="fullName" name="fullName" class="input" required />
+            <p class="form-error hidden" data-error-for="fullName"></p>
+          </div>
+          <div>
+            <label for="nationalId" class="form-label">National ID (14 digits)</label>
+            <input type="text" id="nationalId" name="nationalId" class="input font-mono" maxlength="14" inputmode="numeric" required />
+            <p class="form-error hidden" data-error-for="nationalId"></p>
+          </div>
+          <div>
+            <label for="age" class="form-label">Age</label>
+            <input type="number" id="age" name="age" class="input" min="16" max="100" required />
+            <p class="form-error hidden" data-error-for="age"></p>
+          </div>
+          <div>
+            <label for="studentId" class="form-label">Student ID</label>
+            <input type="text" id="studentId" name="studentId" class="input font-mono" required />
+            <p class="form-error hidden" data-error-for="studentId"></p>
+          </div>
+          <div>
+            <label for="email" class="form-label">Email</label>
+            <input type="email" id="email" name="email" class="input" required />
+            <p class="form-error hidden" data-error-for="email"></p>
+          </div>
+          <div>
+            <label for="phone" class="form-label">Phone Number</label>
+            <input type="tel" id="phone" name="phone" class="input" required />
+            <p class="form-error hidden" data-error-for="phone"></p>
+          </div>
+          <div class="sm:col-span-2">
+            <label for="address" class="form-label">Address</label>
+            <textarea id="address" name="address" class="input" rows="2" required></textarea>
+            <p class="form-error hidden" data-error-for="address"></p>
+          </div>
+        </div>
+
+        <hr class="border-[var(--color-border)]" />
+        <p class="text-sm font-semibold text-primary">Photos (required, max 400 KB each)</p>
+
+        <div class="grid sm:grid-cols-3 gap-4">
+          <div class="file-upload-box">
+            <label for="personalPhoto" class="form-label">Profile Photo</label>
+            <input type="file" id="personalPhoto" name="personalPhoto" accept="image/*" class="input file-input" required />
+            <img id="preview-profile" class="preview-img hidden" alt="Profile preview" />
+            <p class="form-error hidden" data-error-for="personalPhoto"></p>
+          </div>
+          <div class="file-upload-box">
+            <label for="idFront" class="form-label">ID Card — Front</label>
+            <input type="file" id="idFront" name="idFront" accept="image/*" class="input file-input" required />
+            <img id="preview-id-front" class="preview-img hidden" alt="ID front preview" />
+            <p class="form-error hidden" data-error-for="idFront"></p>
+          </div>
+          <div class="file-upload-box">
+            <label for="idBack" class="form-label">ID Card — Back</label>
+            <input type="file" id="idBack" name="idBack" accept="image/*" class="input file-input" required />
+            <img id="preview-id-back" class="preview-img hidden" alt="ID back preview" />
+            <p class="form-error hidden" data-error-for="idBack"></p>
+          </div>
+        </div>
+
+        <button type="submit" id="submit-btn" class="btn btn-primary w-full">Register Member</button>
+      </form>
+    </div>
+  </main>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>

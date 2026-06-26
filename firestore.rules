@@ -1,0 +1,67 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isValidMemberData() {
+      return request.resource.data.keys().hasAll([
+          'fullName', 'nationalId', 'age', 'studentId', 'registrationDate',
+          'email', 'phone', 'address',
+          'personalPhoto', 'idFront', 'idBack'
+        ])
+        && request.resource.data.fullName is string
+        && request.resource.data.fullName.size() >= 2
+        && request.resource.data.nationalId is string
+        && request.resource.data.nationalId.size() == 14
+        && request.resource.data.age is int
+        && request.resource.data.age >= 16
+        && request.resource.data.age <= 100
+        && request.resource.data.studentId is string
+        && request.resource.data.studentId.size() >= 3
+        && request.resource.data.email is string
+        && request.resource.data.email.size() >= 5
+        && request.resource.data.phone is string
+        && request.resource.data.phone.size() >= 8
+        && request.resource.data.address is string
+        && request.resource.data.address.size() >= 5
+        && request.resource.data.personalPhoto is string
+        && request.resource.data.personalPhoto.size() > 0
+        && request.resource.data.idFront is string
+        && request.resource.data.idFront.size() > 0
+        && request.resource.data.idBack is string
+        && request.resource.data.idBack.size() > 0;
+    }
+
+    match /members/{memberId} {
+      allow create: if isValidMemberData()
+        && memberId == request.resource.data.nationalId
+        && !exists(/databases/$(database)/documents/members/$(memberId));
+
+      allow read, update, delete: if isAuthenticated();
+    }
+
+    match /studentIds/{studentId} {
+      allow create: if request.resource.data.keys().hasAll(['memberId', 'createdAt'])
+        && request.resource.data.memberId is string
+        && !exists(/databases/$(database)/documents/studentIds/$(studentId));
+
+      allow read, delete: if isAuthenticated();
+    }
+
+    match /competitions/{compId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /evaluations/{evalId} {
+      allow read, write: if isAuthenticated();
+    }
+
+    match /tasks/{taskId} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}
