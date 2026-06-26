@@ -2,6 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <script>
+    (function () {
+      var path = window.location.pathname;
+      var base = (path === '/Insova' || path.indexOf('/Insova/') === 0) ? '/Insova/' : '/';
+      document.write('<base href="' + base + '">');
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="Admin Login — Team Management System" />
   <title>Admin Login | Team Management System</title>
@@ -13,7 +20,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="../css/styles.css" />
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body data-page="admin-login" class="page-shell font-sans antialiased">
 
@@ -46,7 +53,7 @@
       </div>
 
       <div class="flex items-center justify-between mt-6 text-sm">
-        <a href="../index.html" class="text-muted hover:text-primary transition-colors">&larr; Back to Registration</a>
+        <a href="index.html" class="text-muted hover:text-primary transition-colors">&larr; Back to Registration</a>
         <button type="button" data-theme-toggle class="text-muted hover:text-primary transition-colors flex items-center gap-1" aria-label="Toggle theme">
           <svg data-theme-icon-light class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
           <svg data-theme-icon-dark class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
@@ -56,6 +63,6 @@
     </div>
   </div>
 
-  <script type="module" src="../js/app.js"></script>
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>

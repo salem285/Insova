@@ -9,8 +9,11 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
 import { auth } from './firebase-config.js';
 import { showToast, setButtonLoading } from './utils.js';
+import { appPath } from './paths.js';
 
 const SESSION_KEY = 'tms-admin-session';
+const LOGIN_URL = appPath('admin/login.html');
+const DASHBOARD_URL = appPath('admin/dashboard.html');
 
 /** Persist lightweight session flag (Auth state is source of truth) */
 export function setSession(active) {
@@ -22,7 +25,7 @@ export function setSession(active) {
 }
 
 /** Redirect unauthenticated users away from protected pages */
-export function requireAuth(redirectTo = 'login.html') {
+export function requireAuth(redirectTo = LOGIN_URL) {
   return new Promise((resolve, reject) => {
     const unsubscribe = onAuthStateChanged(
       auth,
@@ -46,7 +49,7 @@ export function requireAuth(redirectTo = 'login.html') {
 }
 
 /** Redirect already-authenticated users away from login page */
-export function redirectIfAuthenticated(redirectTo = 'dashboard.html') {
+export function redirectIfAuthenticated(redirectTo = DASHBOARD_URL) {
   onAuthStateChanged(auth, (user) => {
     if (user) {
       setSession(true);
@@ -78,7 +81,7 @@ function initLoginForm() {
       setSession(true);
       showToast('Login successful. Redirecting…', 'success');
       setTimeout(() => {
-        window.location.href = 'dashboard.html';
+        window.location.href = DASHBOARD_URL;
       }, 800);
     } catch (err) {
       console.error('Login error:', err);
@@ -100,7 +103,7 @@ export function initLogout() {
       try {
         await signOut(auth);
         setSession(false);
-        window.location.href = 'login.html';
+        window.location.href = LOGIN_URL;
       } catch (err) {
         console.error('Logout error:', err);
         showToast('Logout failed.', 'error');

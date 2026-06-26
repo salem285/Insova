@@ -3,6 +3,7 @@
  */
 
 import { requireAuth, initLogout, auth, onAuthStateChanged } from './auth.js';
+import { appPath } from './paths.js';
 import { initMembersTab, refreshMembers, getMembersCache } from './members.js';
 import { initCompetitionsTab, refreshCompetitions, stopCountdownTimers, getCompetitionsCache } from './competitions.js';
 import { initEvaluationsTab, refreshEvaluations } from './evaluations.js';
@@ -82,7 +83,7 @@ async function initDashboard() {
     initTasksTab();
     switchTab('members');
     await loadDashboardData();
-    onAuthStateChanged(auth, (u) => { if (!u) window.location.href = 'login.html'; });
+    onAuthStateChanged(auth, (u) => { if (!u) window.location.href = appPath('admin/login.html'); });
   } catch (err) {
     console.error(err);
   }
